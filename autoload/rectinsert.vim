@@ -1,45 +1,11 @@
-" Rectangular insert command
-" Version: 0.1.0
-" Author:  hekyou <hekyolabs+vim@gmail.com>
+if exists('g:loaded_rectinsert')
+  finish
+endif
+let g:loaded_rectinsert = 1
 
-scriptencoding utf-8
+command! -nargs=* RectInsert call rectinsert#rectInsert(<f-args>)
+command! -nargs=? RectInsertFromClipboard call rectinsert#rectInsertFromClipboard(<q-args>)
 
-function! rectinsert#rectInsert(opt)
-  let s:insert_type = a:opt =~ '-a' ? 'a' : 'i'
-
-  let s:save_cpo = &cpo
-  let s:save_ve = &ve
-  let s:save_et = &et
-
-  set cpo&vim
-  set ve=all
-  set noet
-
-  let s:pos = getpos('.')
-
-  let s:data = split(@*, "\n")
-
-  call s:insert(s:insert_type, s:data[0], s:pos[2])
-
-  for s:line in s:data[1:]
-    if line('.') == line('$')
-      execute ":normal o"
-      call cursor(line('.'), s:pos[2])
-    else
-      execute ":normal j"
-    endif
-    call s:insert(s:insert_type, s:line, s:pos[2])
-  endfor
-
-  call setpos('.', s:pos)
-
-  let &et = s:save_et
-  let &ve = s:save_ve
-  let &cpo = s:save_cpo
-endfunction
-
-function! s:insert(type, str, col)
-  execute ":normal ".a:type.a:str
-  call cursor(line('.'), a:col)
-endfunction
+nnoremap <silent> <Plug>(rectinsert_insert) :<C-u>RectInsert -i<CR>
+nnoremap <silent> <Plug>(rectinsert_append) :<C-u>RectInsert -a<CR>
 
