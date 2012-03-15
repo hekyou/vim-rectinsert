@@ -1,19 +1,19 @@
 " Rectangular insert command
-" Version: 0.3.0
+" Version: 0.3.1
 " Author:  hekyou <hekyolabs+vim@gmail.com>
 
 scriptencoding utf-8
 
-function! rectinsert#rectInsert(opt, src)
-  call s:insert(a:opt, a:src)
-endfunction
-
-function! rectinsert#rectInsertFromClipboard(opt)
+function! rectinsert#rectInsert(opt)
   call s:insert(a:opt, @*)
 endfunction
 
-function! rectinsert#rectVisualInsertFromClipboard(opt)
-  call s:visual_insert(a:opt, @*)
+function! rectinsert#rectVisualInsert()
+  call s:visual_insert(@*)
+endfunction
+
+function! rectinsert#rectStringInsert(opt, src)
+  call s:insert(a:opt, a:src)
 endfunction
 
 function! s:insert(opt, src)
@@ -47,9 +47,10 @@ function! s:insert(opt, src)
   call setpos('.', s:pos)
 
   let &cpo = s:save_cpo
+  unlet s:save_cpo
 endfunction
 
-function! s:visual_insert(opt, src)
+function! s:visual_insert(src)
   let s:save_cpo = &cpo
   set cpo&vim
 
@@ -80,5 +81,6 @@ function! s:visual_insert(opt, src)
   call setpos('.', s:start_pos)
 
   let &cpo = s:save_cpo
+  unlet s:save_cpo
 endfunction
 
