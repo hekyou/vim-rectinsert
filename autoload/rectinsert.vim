@@ -1,5 +1,5 @@
 " Rectangular insert command
-" Version: 0.4.0
+" Version: 0.4.1
 " Author:  hekyou <hekyolabs+vim@gmail.com>
 
 scriptencoding utf-8
@@ -44,8 +44,6 @@ function! s:insert(opt, src)
 
     let s:idx = s:idx + 1
   endfor
-
-  call setpos('.', s:pos)
 endfunction
 
 function! s:visual_insert(src)
@@ -72,8 +70,6 @@ function! s:visual_insert(src)
 
     let s:idx = s:idx + 1
   endwhile
-
-  call setpos('.', s:start_pos)
 endfunction
 
 function! s:script_insert(opt)
