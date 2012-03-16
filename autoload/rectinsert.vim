@@ -1,25 +1,26 @@
 " Rectangular insert command
-" Version: 0.3.1
+" Version: 0.4.0
 " Author:  hekyou <hekyolabs+vim@gmail.com>
 
 scriptencoding utf-8
 
-function! rectinsert#rectInsert(opt)
+function! rectinsert#insert(opt)
   call s:insert(a:opt, @*)
 endfunction
 
-function! rectinsert#rectVisualInsert()
+function! rectinsert#visualInsert()
   call s:visual_insert(@*)
 endfunction
 
-function! rectinsert#rectStringInsert(opt, src)
+function! rectinsert#scriptInsert(opt)
+  call s:script_insert(a:opt)
+endfunction
+
+function! rectinsert#stringInsert(opt, src)
   call s:insert(a:opt, a:src)
 endfunction
 
 function! s:insert(opt, src)
-  let s:save_cpo = &cpo
-  set cpo&vim
-
   let s:pos = getpos('.')
 
   let s:base_line = s:pos[1]
@@ -36,7 +37,7 @@ function! s:insert(opt, src)
   for s:line in s:data
     let s:str = getline(s:base_line + s:idx)
     while strlen(s:str) < s:base_col
-        let s:str = s:str . " "
+      let s:str = s:str . " "
     endwhile
     let s:str = strpart(s:str, 0, s:base_col) . s:line . strpart(s:str, s:base_col)
     call setline(s:base_line + s:idx, s:str)
@@ -45,15 +46,9 @@ function! s:insert(opt, src)
   endfor
 
   call setpos('.', s:pos)
-
-  let &cpo = s:save_cpo
-  unlet s:save_cpo
 endfunction
 
 function! s:visual_insert(src)
-  let s:save_cpo = &cpo
-  set cpo&vim
-
   let s:start_pos = getpos("'<")
   let s:end_pos = getpos("'>")
 
@@ -70,7 +65,7 @@ function! s:visual_insert(src)
   while s:idx < s:line_cnt
     let s:str = getline(s:base_line + s:idx)
     while strlen(s:str) < s:base_col
-        let s:str = s:str . " "
+      let s:str = s:str . " "
     endwhile
     let s:str = strpart(s:str, 0, s:base_col) . s:data[s:idx % s:data_cnt] . strpart(s:str, s:base_col)
     call setline(s:base_line + s:idx, s:str)
@@ -79,8 +74,27 @@ function! s:visual_insert(src)
   endwhile
 
   call setpos('.', s:start_pos)
+endfunction
 
-  let &cpo = s:save_cpo
-  unlet s:save_cpo
+function! s:script_insert(opt)
+  let s:filetype = a:opt
+
+  if !exists('s:bufnr')
+      let s:bufnr = -1
+  endif
+  if bufexists(s:bufnr)
+      let g:__rectinsert_script_result__ = ''
+      execute "QuickRun -outputter variable:name=__rectinsert_script_result__"
+      execute 'bd! '.s:bufnr
+      unlet s:bufnr
+      call rectinsert#stringInsert("-i", g:__rectinsert_script_result__)
+      unlet g:__rectinsert_script_result__
+  else
+      setlocal bufhidden=hide buftype=nofile noswapfile
+      execute 'split'
+      execute 'edit [RectScriptInsert]['.s:filetype.']'
+      let s:bufnr = bufnr('%')
+      execute "setlocal filetype=".s:filetype
+  endif
 endfunction
 
