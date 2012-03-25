@@ -1,5 +1,5 @@
 " Rectangular insert command
-" Version: 0.4.2
+" Version: 0.4.3
 " Author:  hekyou <hekyolabs+vim@gmail.com>
 
 if exists('g:loaded_rectinsert')
